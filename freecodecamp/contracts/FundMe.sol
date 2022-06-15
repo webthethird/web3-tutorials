@@ -13,11 +13,17 @@ contract FundMe {
     // Minimum funding value (in USD)
     uint256 public minimumUSD = 50;
 
+    address payable public owner;
     address[] public funders;
     mapping(address => uint256) public fundedByAddress;
 
     constructor() {
+        owner = payable(msg.sender);
+    }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the contract owner can withdraw funds!");
+        _;
     }
 
     function fund() public payable {
@@ -27,8 +33,24 @@ contract FundMe {
         fundedByAddress[msg.sender] += msg.value;
     }
 
-    function withdraw() public {
+    function withdraw() public onlyOwner {
+        for(uint i = 0; i < funders.length; i++) {
+            fundedByAddress[funders[i]] = 0;
+        }
+        // reset the array
+        funders = new address[](0);
 
+        // withdraw the funds
+        // three ways to send ETH
+        // 1: transfer (2300 gas, throws error on failure)
+        // owner.transfer(address(this).balance);
+        // 2: send (2300 gas, returns bool)
+        // bool sendSuccess = owner.send(address(this).balance);
+        // require(sendSuccess, "Send failed");
+        // 3: call (forward all gas or set gas, returns bool plus any return data)
+        //    this is currently the recommended way to send ETH
+        (bool callSuccess, bytes memory dataReturned) = owner.call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
     }
 
 }
