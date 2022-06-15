@@ -25,3 +25,10 @@ But the way I see it, Patrick put this course together as a masterclass on Web3,
 insightful nuggets of useful info nestled in there with the introductory stuff. Anyway, what better place is there to 
 start than from the top? All I know is I need to put what I know together with everything else I need to learn to finish
 what I started years ago, and I need to start _right now!_
+
+- Chainlink out-of-the-box features:
+  - Price Feeds
+  - Verifiable Random Numbers (VRF)
+  - Keepers: Listen for external triggers and look-up actions specified for specific contracts 
+  - Http GET API calls (does not come with the decentralized network of Chainlink nodes)
+- Requesting data from Chainlink nodes requires LINK
