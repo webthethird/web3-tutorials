@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.7; // Latest is 0.8.14
 
-contract SimpleStorage 
-{
+contract SimpleStorage {
     uint256 favoriteNumber;
 
     struct Person {
@@ -21,8 +20,8 @@ contract SimpleStorage
     function store(uint256 _favoriteNumber) public {
         favoriteNumber = _favoriteNumber;
     }
-    
-    function retrieve() public view returns (uint256){
+
+    function retrieve() public view returns (uint256) {
         return favoriteNumber;
     }
 
@@ -40,19 +39,16 @@ contract SimpleStorage
     function nameToFavoriteNumber(
         string calldata _firstName,
         string calldata _lastName
-    ) public view returns (
-        uint256 _favoriteNumber
-    ) {
+    ) public view returns (uint256 _favoriteNumber) {
         _favoriteNumber = _nameToFavoriteNumber[_lastName][_firstName];
     }
 
     function addPerson(
-        string memory _firstName, 
-        string memory _lastName, 
+        string memory _firstName,
+        string memory _lastName,
         uint256 _favoriteNumber
     ) public {
         people.push(Person(_favoriteNumber, _firstName, _lastName));
         _nameToFavoriteNumber[_lastName][_firstName] = _favoriteNumber;
     }
 }
-

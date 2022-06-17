@@ -22,19 +22,25 @@ contract FundMe {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only the contract owner can withdraw funds!");
+        require(
+            msg.sender == owner,
+            "Only the contract owner can withdraw funds!"
+        );
         _;
     }
 
     function fund() public payable {
         // require(getConversionRate(msg.value) >= minimumUSD * 1e18, "Below minimum funding value!");
-        require(msg.value.getConversionRate() >= minimumUSD * 1e18, "Below minimum funding value!");
+        require(
+            msg.value.getConversionRate() >= minimumUSD * 1e18,
+            "Below minimum funding value!"
+        );
         funders.push(msg.sender);
         fundedByAddress[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
-        for(uint i = 0; i < funders.length; i++) {
+        for (uint i = 0; i < funders.length; i++) {
             fundedByAddress[funders[i]] = 0;
         }
         // reset the array
@@ -49,8 +55,9 @@ contract FundMe {
         // require(sendSuccess, "Send failed");
         // 3: call (forward all gas or set gas, returns bool plus any return data)
         //    this is currently the recommended way to send ETH
-        (bool callSuccess, bytes memory dataReturned) = owner.call{value: address(this).balance}("");
+        (bool callSuccess, bytes memory dataReturned) = owner.call{
+            value: address(this).balance
+        }("");
         require(callSuccess, "Call failed");
     }
-
 }
