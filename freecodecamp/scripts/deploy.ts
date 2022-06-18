@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import * as fs from "fs-extra";
+import "dotenv/config";
 
 /**
  * Asynchronous functions return a Promise,
@@ -20,11 +21,8 @@ async function main() {
   /**
    * Set up provider and wallet - Ethers + Ganache
    */
-  let provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:7545");
-  let wallet = new ethers.Wallet(
-    "fa3ab1f9da733df326ab484fd49ff991f667c673d15c5b1c428e0867564511e3",
-    provider
-  );
+  let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
 
   /**
    * Read the compiled contract's ABI and binary files
@@ -73,6 +71,9 @@ async function main() {
   // let sentTxResponse = await wallet.sendTransaction(tx);
   // console.log(sentTxResponse);
 
+  /**
+   * Now, interact with our SimpleStorage contract
+   */
   let currentFavoriteNumber = await contract.retrieve();
   console.log(`Current favorite number: ${currentFavoriteNumber}`);
   let transactionResponse = await contract.store("5");
