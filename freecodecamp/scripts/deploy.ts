@@ -1,6 +1,6 @@
-import { ethers } from "ethers";
-import * as fs from "fs-extra";
-import "dotenv/config";
+import { ethers } from "ethers"
+import * as fs from "fs-extra"
+import "dotenv/config"
 
 /**
  * Asynchronous functions return a Promise,
@@ -21,26 +21,25 @@ async function main() {
   /**
    * Set up provider and wallet - Ethers + Ganache
    */
-  let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-  let encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf-8");
-  // let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
-  let wallet = ethers.Wallet.fromEncryptedJsonSync(
-    encryptedJson,
-    process.env.PRIVATE_KEY_PASSWORD!
-  );
-  wallet = wallet.connect(provider);
-
+  let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
+  // let encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf-8");
+  // let wallet = ethers.Wallet.fromEncryptedJsonSync(
+  //   encryptedJson,
+  //   process.env.PRIVATE_KEY_PASSWORD!
+  // );
+  // wallet = wallet.connect(provider);
+  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
   /**
    * Read the compiled contract's ABI and binary files
    */
   const abi = fs.readFileSync(
     "./contracts/artifacts/contracts_SimpleStorage_sol_SimpleStorage.abi",
     "utf8"
-  );
+  )
   const binary = fs.readFileSync(
     "./contracts/artifacts/contracts_SimpleStorage_sol_SimpleStorage.bin",
     "utf8"
-  );
+  )
 
   /**
    * Deploy contracts
@@ -48,10 +47,10 @@ async function main() {
    * RPC Server: http://127.0.0.1:7545
    * Later we use the Hardhat virtual testing environment.
    */
-  const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
-  console.log("Deploying...");
-  const contract = await contractFactory.deploy();
-  const deploymentReceipt = await contract.deployTransaction.wait(1);
+  const contractFactory = new ethers.ContractFactory(abi, binary, wallet)
+  console.log("Deploying...")
+  const contract = await contractFactory.deploy()
+  const deploymentReceipt = await contract.deployTransaction.wait(1)
   // console.log("Deployment Transaction:");
   // console.log(contract.deployTransaction);
   // console.log("Transaction Receipt (after one confirmation):");
@@ -80,12 +79,12 @@ async function main() {
   /**
    * Now, interact with our SimpleStorage contract
    */
-  let currentFavoriteNumber = await contract.retrieve();
-  console.log(`Current favorite number: ${currentFavoriteNumber}`);
-  let transactionResponse = await contract.store("5");
-  let transactionReceipt = await transactionResponse.wait(1);
-  currentFavoriteNumber = await contract.retrieve();
-  console.log(`Updated favorite number: ${currentFavoriteNumber}`);
+  let currentFavoriteNumber = await contract.retrieve()
+  console.log(`Current favorite number: ${currentFavoriteNumber}`)
+  let transactionResponse = await contract.store("5")
+  let transactionReceipt = await transactionResponse.wait(1)
+  currentFavoriteNumber = await contract.retrieve()
+  console.log(`Updated favorite number: ${currentFavoriteNumber}`)
 }
 
 /**
@@ -101,6 +100,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+    console.error(error)
+    process.exit(1)
+  })
