@@ -39,64 +39,23 @@ exports.__esModule = true;
 var ethers_1 = require("ethers");
 var fs = require("fs-extra");
 require("dotenv/config");
-/**
- * Asynchronous functions return a Promise,
- * which can have one of three states:
- * - Pending
- * - Fulfilled
- * - Rejected
- * `await` keyword in front of an async function
- * waits for Promise to be fulfilled or rejected
- */
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var provider, encryptedJson, wallet, abi, binary, contractFactory, contract, deploymentReceipt, currentFavoriteNumber, transactionResponse, transactionReceipt;
+        var wallet, encryptedJsonKey;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    provider = new ethers_1.ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-                    encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf-8");
-                    wallet = ethers_1.ethers.Wallet.fromEncryptedJsonSync(encryptedJson, process.env.PRIVATE_KEY_PASSWORD);
-                    wallet = wallet.connect(provider);
-                    abi = fs.readFileSync("./contracts/artifacts/contracts_SimpleStorage_sol_SimpleStorage.abi", "utf8");
-                    binary = fs.readFileSync("./contracts/artifacts/contracts_SimpleStorage_sol_SimpleStorage.bin", "utf8");
-                    contractFactory = new ethers_1.ethers.ContractFactory(abi, binary, wallet);
-                    console.log("Deploying...");
-                    return [4 /*yield*/, contractFactory.deploy()];
+                    wallet = new ethers_1.ethers.Wallet(process.env.PRIVATE_KEY);
+                    return [4 /*yield*/, wallet.encrypt(process.env.PRIVATE_KEY_PASSWORD, process.env.PRIVATE_KEY)];
                 case 1:
-                    contract = _a.sent();
-                    return [4 /*yield*/, contract.deployTransaction.wait(1)];
-                case 2:
-                    deploymentReceipt = _a.sent();
-                    return [4 /*yield*/, contract.retrieve()];
-                case 3:
-                    currentFavoriteNumber = _a.sent();
-                    console.log("Current favorite number: " + currentFavoriteNumber);
-                    return [4 /*yield*/, contract.store("5")];
-                case 4:
-                    transactionResponse = _a.sent();
-                    return [4 /*yield*/, transactionResponse.wait(1)];
-                case 5:
-                    transactionReceipt = _a.sent();
-                    return [4 /*yield*/, contract.retrieve()];
-                case 6:
-                    currentFavoriteNumber = _a.sent();
-                    console.log("Updated favorite number: " + currentFavoriteNumber);
+                    encryptedJsonKey = _a.sent();
+                    console.log(encryptedJsonKey);
+                    fs.writeFileSync("./.encryptedKey.json", encryptedJsonKey);
                     return [2 /*return*/];
             }
         });
     });
 }
-/**
- * Using (Learning) Typescript
- * First, it is necessary to have installed node-typescript.
- * We also install @types/fs-extra and @types/node using yarn
- * and we have a new file: tsconfig.json
- * Then, Typescript must be compiled into Javascript using:
- *      >> tsc scripts/deploy.ts
- * Finally, we use Node to run the Javascript using:
- *      >> node scripts/deploy.js
- */
 main()
     .then(function () { return process.exit(0); })["catch"](function (error) {
     console.error(error);

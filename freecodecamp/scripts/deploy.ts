@@ -22,7 +22,13 @@ async function main() {
    * Set up provider and wallet - Ethers + Ganache
    */
   let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+  let encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf-8");
+  // let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+  let wallet = ethers.Wallet.fromEncryptedJsonSync(
+    encryptedJson,
+    process.env.PRIVATE_KEY_PASSWORD!
+  );
+  wallet = wallet.connect(provider);
 
   /**
    * Read the compiled contract's ABI and binary files
