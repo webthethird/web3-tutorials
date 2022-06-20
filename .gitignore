@@ -33,6 +33,7 @@ artifacts
 .DS_Store
 .env*
 .encrypted*
+gas-report.txt
 
 # debug
 npm-debug.log*
