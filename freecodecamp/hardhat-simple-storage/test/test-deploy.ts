@@ -1,18 +1,20 @@
-const { ethers } = require("hardhat")
-const { expect, assert } = require("chai")
-require("dotenv/config")
+import { ethers } from "hardhat"
+import { expect, assert } from "chai"
+import { SimpleStorage, SimpleStorage__factory, StorageFactory, StorageFactory__factory } from "../typechain-types"
+import "dotenv/config"
 
 describe("SimpleStorage", function () {
-  let simpleStorageFactory, simpleStorage
+  let simpleStorageFactory: SimpleStorage__factory
+  let simpleStorage: SimpleStorage
 
   beforeEach(async function () {
-    simpleStorageFactory = await ethers.getContractFactory("SimpleStorage")
+    simpleStorageFactory = (await ethers.getContractFactory("SimpleStorage")) as SimpleStorage__factory
     simpleStorage = await simpleStorageFactory.deploy()
   })
 
   it("Should start with a favorite number of 0", async function () {
     const currentValue = await simpleStorage.retrieve()
-    const expectedValue = 0
+    const expectedValue = "0"
     assert.equal(currentValue.toString(), expectedValue)
   })
   it("Should update when we call store", async function () {
@@ -25,17 +27,19 @@ describe("SimpleStorage", function () {
 })
 
 describe("StorageFactory", function () {
-  let simpleStorage, simpleStorageAddress, storageFactory, storageFactoryFactory
+  let simpleStorageFactory: SimpleStorage__factory
+  let simpleStorage: SimpleStorage
+  let storageFactory: StorageFactory
+  let storageFactoryFactory: StorageFactory__factory
+  let simpleStorageAddress: string
 
   beforeEach(async function () {
-    storageFactoryFactory = await ethers.getContractFactory("StorageFactory")
+    storageFactoryFactory = (await ethers.getContractFactory("StorageFactory")) as StorageFactory__factory
+    simpleStorageFactory = (await ethers.getContractFactory("SimpleStorage")) as SimpleStorage__factory
     storageFactory = await storageFactoryFactory.deploy()
     await storageFactory.createSimpleStorage()
     simpleStorageAddress = await storageFactory.sfGetAddress(0)
-    simpleStorage = await ethers.getContractAt(
-      "SimpleStorage",
-      simpleStorageAddress
-    )
+    simpleStorage = simpleStorageFactory.attach(simpleStorageAddress)
   })
 
   it("Should deploy a SimpleStorage contract and return its address", async function () {
@@ -44,7 +48,7 @@ describe("StorageFactory", function () {
   })
   it("Should retrieve value of 0 from SimpleStorage", async function () {
     const currentValue = await storageFactory.sfGetNumber(0)
-    const expectedValue = 0
+    const expectedValue = "0"
     assert.equal(currentValue.toString(), expectedValue)
   })
   it("Should update the value in SimpleStorage when we call StorageFactory.sfStoreNumber", async function () {
@@ -60,15 +64,18 @@ describe("StorageFactory", function () {
 })
 
 describe("StorageFactory + Person", async function () {
-  let simpleStorage, storageFactory, simpleStorageFactory, storageFactoryFactory
+  let simpleStorageFactory: SimpleStorage__factory
+  let simpleStorage: SimpleStorage
+  let storageFactory: StorageFactory
+  let storageFactoryFactory: StorageFactory__factory
 
   beforeEach(async function () {
-    storageFactoryFactory = await ethers.getContractFactory("StorageFactory")
-    simpleStorageFactory = await ethers.getContractFactory("SimpleStorage")
+    storageFactoryFactory = (await ethers.getContractFactory("StorageFactory")) as StorageFactory__factory
+    simpleStorageFactory = (await ethers.getContractFactory("SimpleStorage")) as SimpleStorage__factory
     storageFactory = await storageFactoryFactory.deploy()
     await storageFactory.createSimpleStorage()
     const simpleStorageAddress = await storageFactory.sfGetAddress(0)
-    simpleStorage = await simpleStorageFactory.attach(simpleStorageAddress)
+    simpleStorage = simpleStorageFactory.attach(simpleStorageAddress)
     const transactionResponse = await storageFactory.sfStorePerson(
       "0",
       "Vitalik",

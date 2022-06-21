@@ -1,11 +1,12 @@
-const { task } = require("hardhat/config")
+import { task } from "hardhat/config"
+import { HardhatRuntimeEnvironment } from "hardhat/types"
 
 /**
  * My first Hardhat task!
  */
-task("block-number", "Prints the current block number").setAction(
+export default task("block-number", "Prints the current block number").setAction(
   // Called an "anonymous function" in Javascript
-  async (taskargs, hre) => {
+  async (taskargs: any[], hre: HardhatRuntimeEnvironment) => {
     /**
      * hre: Hardhat runtime environment
      */
@@ -14,4 +15,4 @@ task("block-number", "Prints the current block number").setAction(
   }
 )
 
-module.exports = {}
+

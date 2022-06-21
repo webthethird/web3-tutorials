@@ -24,6 +24,8 @@ tenderly.yaml
 
 # testing
 coverage
+typechain
+typechain-types
 
 # production
 build

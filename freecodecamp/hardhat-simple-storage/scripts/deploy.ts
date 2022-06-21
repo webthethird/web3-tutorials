@@ -15,7 +15,7 @@ async function main() {
   console.log(`Deployed contract to: ${simpleStorage.address}`)
 
   // Only attempt to verify on Etherscan if the network is Rinkeby and API key is in .env
-  if (network.config.chainId === 4 && process.env.ETHERSCAN_API_KEY!) {
+  if (network.config.chainId === 4 && process.env.ETHERSCAN_API_KEY) {
     console.log("Waiting for 6 confirmations before verification...")
     // Wait a few blocks before verifying to give Etherscan time to update
     await simpleStorage.deployTransaction.wait(6)
@@ -37,14 +37,14 @@ async function main() {
   console.log(`Updated value is: ${currentValue}`)
 }
 
-async function verify(contractAddress, args) {
+async function verify(contractAddress: string, args: any[]) {
   console.log("Verifying contract...")
   try {
     await run("verify:verify", {
       address: contractAddress,
       constructorArguments: args,
     })
-  } catch (err) {
+  } catch (err: any) {
     if (err.message.toLowerCase().includes("already verified")) {
       console.log("Already verified!")
     } else {
