@@ -30,6 +30,8 @@ typechain-types
 # production
 build
 artifacts
+deployments
+cache
 
 # misc
 .DS_Store
