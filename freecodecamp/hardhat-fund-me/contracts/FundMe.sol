@@ -1,13 +1,40 @@
 // SPDX-License-Identifier: MIT
+
+/** Solidity Style Guide:
+ *  Overall file layout in order:
+ *  1. Pragma
+ *  2. Imports
+ *    (Error codes)
+ *  3. Interfaces
+ *  4. Libraries
+ *  5. Contracts 
+ */
 pragma solidity ^0.8.8;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./PriceConverter.sol";
 
-error NotOwner();
+// Error code
+error FundMe__NotOwner();
 
+/** @title FundMe: crowdfunding contract
+ *  @author William E Bodell III
+ *  @notice This contract is part of the tutorial by Patrick Collins
+ *  @dev Uses Chainlink price feeds along with our library
+ */
 contract FundMe {
+    /** Solidity Style Guide:
+    *  Overall file layout in order:
+    *  1. Pragma
+    *  2. Imports
+    *    (Error codes)
+    *  3. Interfaces
+    *  4. Libraries
+    *  5. Contracts 
+    */
     using PriceConverter for uint256;
+
+    AggregatorV3Interface public priceFeed;
 
     mapping(address => uint256) public addressToAmountFunded;
     address[] public funders;
@@ -15,27 +42,23 @@ contract FundMe {
     // Could we make this constant?  /* hint: no! We should make it immutable! */
     address public /* immutable */ i_owner;
     uint256 public constant MINIMUM_USD = 50 * 10 ** 18;
+
+    modifier onlyOwner {
+        // require(msg.sender == owner);
+        if (msg.sender != i_owner) revert FundMe__NotOwner();
+        _;
+    }
     
-    constructor() {
+    constructor(address _priceFeed) {
         i_owner = msg.sender;
+        priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
     function fund() public payable {
-        require(msg.value.getConversionRate() >= MINIMUM_USD, "You need to spend more ETH!");
+        require(msg.value.getConversionRate(priceFeed) >= MINIMUM_USD, "You need to spend more ETH!");
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         addressToAmountFunded[msg.sender] += msg.value;
         funders.push(msg.sender);
-    }
-    
-    function getVersion() public view returns (uint256){
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x8A753747A1Fa494EC906cE90E9f37563A8AF630e);
-        return priceFeed.version();
-    }
-    
-    modifier onlyOwner {
-        // require(msg.sender == owner);
-        if (msg.sender != i_owner) revert NotOwner();
-        _;
     }
     
     function withdraw() payable onlyOwner public {
