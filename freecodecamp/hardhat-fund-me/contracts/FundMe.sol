@@ -31,14 +31,15 @@ contract FundMe {
      *  4. Modifiers
      *  5. Functions
      */
+
     // Type declarations
     using PriceConverter for uint256;
 
     // State Variables
-    AggregatorV3Interface public priceFeed;
-    mapping(address => uint256) public addressToAmountFunded;
-    address[] public funders;
-    address public immutable i_owner;
+    AggregatorV3Interface private _priceFeed;
+    mapping(address => uint256) private _addressToAmountFunded;
+    address[] private _funders;
+    address private immutable i_owner;
     uint256 public constant MINIMUM_USD = 50 * 10**18;
 
     // Events
@@ -61,17 +62,9 @@ contract FundMe {
      *  private
      *  view / pure
      */
-    constructor(address _priceFeed) {
+    constructor(address priceFeed) {
         i_owner = msg.sender;
-        priceFeed = AggregatorV3Interface(_priceFeed);
-    }
-
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
+        _priceFeed = AggregatorV3Interface(priceFeed);
     }
 
     /**
@@ -80,12 +73,12 @@ contract FundMe {
      */
     function fund() public payable {
         require(
-            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
+            msg.value.getConversionRate(_priceFeed) >= MINIMUM_USD,
             "You need to spend more ETH!"
         );
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
-        addressToAmountFunded[msg.sender] += msg.value;
-        funders.push(msg.sender);
+        _addressToAmountFunded[msg.sender] += msg.value;
+        _funders.push(msg.sender);
     }
 
     /**
@@ -93,25 +86,42 @@ contract FundMe {
      *  @dev Only allows withdrawals by the owner
      */
     function withdraw() public payable onlyOwner {
+        address[] memory funders = _funders;
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
             funderIndex++
         ) {
             address funder = funders[funderIndex];
-            addressToAmountFunded[funder] = 0;
+            _addressToAmountFunded[funder] = 0;
         }
-        funders = new address[](0);
+        _funders = new address[](0);
         // // transfer
         // payable(msg.sender).transfer(address(this).balance);
         // // send
         // bool sendSuccess = payable(msg.sender).send(address(this).balance);
         // require(sendSuccess, "Send failed");
         // call
-        (bool callSuccess, ) = payable(msg.sender).call{
+        (bool callSuccess, ) = payable(i_owner).call{
             value: address(this).balance
         }("");
         require(callSuccess, "Call failed");
+    }
+
+    function getOwner() public view returns (address) {
+        return i_owner;
+    }
+
+    function getFunder(uint256 index) public view returns (address) {
+        return _funders[index];
+    }
+
+    function getAmountFunded(address funder) public view returns (uint256) {
+        return _addressToAmountFunded[funder];
+    }
+
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return _priceFeed;
     }
 }
 
