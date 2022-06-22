@@ -87,12 +87,14 @@ contract FundMe {
      */
     function withdraw() public payable onlyOwner {
         address[] memory funders = _funders;
+        uint256 total = 0;
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
             funderIndex++
         ) {
             address funder = funders[funderIndex];
+            total += _addressToAmountFunded[funder];
             _addressToAmountFunded[funder] = 0;
         }
         _funders = new address[](0);
@@ -102,9 +104,7 @@ contract FundMe {
         // bool sendSuccess = payable(msg.sender).send(address(this).balance);
         // require(sendSuccess, "Send failed");
         // call
-        (bool callSuccess, ) = payable(i_owner).call{
-            value: address(this).balance
-        }("");
+        (bool callSuccess, ) = payable(i_owner).call{value: total}("");
         require(callSuccess, "Call failed");
     }
 

@@ -24,6 +24,7 @@ tenderly.yaml
 
 # testing
 coverage
+coverage.json
 typechain
 typechain-types
 
