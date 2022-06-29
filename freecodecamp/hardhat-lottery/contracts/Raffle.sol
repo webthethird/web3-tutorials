@@ -50,7 +50,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     address payable[] private s_players;
     address payable private s_recentWinner;
     RaffleState private s_raffleState;
-    uint256 private s_lastTimeStamp;
+    uint256 private s_lastTimestamp;
 
     /* Events */
     event RaffleEnter(
@@ -113,7 +113,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         )
     {
         bool isOpen = RaffleState.OPEN == s_raffleState;
-        bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
+        bool timePassed = (block.timestamp - s_lastTimestamp) > i_interval;
         bool hasPlayers = s_players.length > 0;
         bool hasBalance = address(this).balance > 0;
         upkeepNeeded = isOpen && timePassed && hasPlayers && hasBalance;
@@ -161,7 +161,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         s_recentWinner = recentWinner;
         s_raffleState = RaffleState.OPEN;
         s_players = new address payable[](0);
-        s_lastTimeStamp = block.timestamp;
+        s_lastTimestamp = block.timestamp;
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
         if (!success) {
             revert Raffle__TransferFailed();
@@ -178,7 +178,27 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return s_players[playerIndex];
     }
 
+    function getNumPlayers() public view returns (uint256) {
+        return s_players.length;
+    }
+
     function getRecentWinner() public view returns (address) {
         return s_recentWinner;
+    }
+
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getNumWords() public pure returns (uint256) {
+        return NUM_WORDS;
+    }
+
+    function getLastTimestamp() public view returns (uint256) {
+        return s_lastTimestamp;
+    }
+
+    function getRequestConfirmations() public pure returns (uint256) {
+        return REQUEST_CONFIRMATIONS;
     }
 }
