@@ -17,11 +17,7 @@ import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 error Raffle__NotEnoughETHToEnter();
 error Raffle__TransferFailed();
 error Raffle__RaffleIsNotOpen();
-error Raffle__UpkeepNotNeeded(
-    uint256 currentBalance,
-    uint256 numPlayers,
-    uint256 raffleState
-);
+error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
 /**
  * @title A sample Raffle contract
@@ -53,26 +49,31 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     uint256 private s_lastTimestamp;
 
     /* Events */
-    event RaffleEnter(
-        address indexed entrant,
-        uint256 indexed entryValue,
-        uint256 totalEntrants
-    );
+    event RaffleEnter(address indexed entrant, uint256 indexed entryValue, uint256 totalEntrants);
 
     event RequestedRaffleWinner(uint256 indexed requestId);
 
     event WinnerPicked(address indexed winner);
 
+    /**
+     * @param vrfCoordinator    The address for the Chainlink VRFCoordinator contract
+     * @param entranceFee       The minimum value that must be sent to `enterRaffle()`
+     * @param gasLane           The key hash for the gas limit setting for our VRF call
+     * @param subscriptionId    The subscription ID created at https://vrf.chain.link
+     * @param callbackGasLimit  The gas limit for the callback request to `fullfilRandomWords()`
+     * @param interval          The time interval between calling `fullfilRandomWords()` and
+     *                          `checkUpkeep()` returning true, triggering another request
+     */
     constructor(
-        address _vrfCoordinator,
+        address vrfCoordinator,
         uint256 entranceFee,
         bytes32 gasLane,
         uint64 subscriptionId,
         uint32 callbackGasLimit,
         uint256 interval
-    ) VRFConsumerBaseV2(_vrfCoordinator) {
+    ) VRFConsumerBaseV2(vrfCoordinator) {
         i_entranceFee = entranceFee;
-        i_vrfCoordinator = VRFCoordinatorV2Interface(_vrfCoordinator);
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -155,9 +156,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         uint256, /* requestId */ // <-- tells compiler that this parameter will not be used
         uint256[] memory randomWords
     ) internal override {
-        address payable recentWinner = s_players[
-            randomWords[0] % s_players.length
-        ];
+        address payable recentWinner = s_players[randomWords[0] % s_players.length];
         s_recentWinner = recentWinner;
         s_raffleState = RaffleState.OPEN;
         s_players = new address payable[](0);
@@ -200,5 +199,9 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function getRequestConfirmations() public pure returns (uint256) {
         return REQUEST_CONFIRMATIONS;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
     }
 }
