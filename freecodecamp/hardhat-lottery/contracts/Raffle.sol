@@ -79,6 +79,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         i_callbackGasLimit = callbackGasLimit;
         i_interval = interval;
         s_raffleState = RaffleState.OPEN;
+        s_lastTimestamp = block.timestamp;
     }
 
     function enterRaffle() public payable {
@@ -106,7 +107,6 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         bytes memory /* checkData */
     )
         public
-        view
         override
         returns (
             bool upkeepNeeded,
@@ -145,6 +145,9 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
             i_callbackGasLimit,
             NUM_WORDS
         );
+        // This is redundant!!
+        // VRFCoordinatorV2.requestRandomWords also emits an event,
+        // called RandomWordsRequested, which also has the requestId
         emit RequestedRaffleWinner(requestId);
     }
 
@@ -203,5 +206,17 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function getInterval() public view returns (uint256) {
         return i_interval;
+    }
+
+    function getSubscriptionId() public view returns (uint64) {
+        return i_subscriptionId;
+    }
+
+    function getGasLane() public view returns (bytes32) {
+        return i_gasLane;
+    }
+
+    function getCallbackGasLimit() public view returns (uint32) {
+        return i_callbackGasLimit;
     }
 }
