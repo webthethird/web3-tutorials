@@ -23,7 +23,6 @@ const RINKEBY_RPC_URL =
 //  process.env.POLYGON_MAINNET_RPC_URL || "https://polygon-mainnet.alchemyapi.io/v2/your-api-key"
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "key"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "key"
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "key"
 const REPORT_GAS = process.env.REPORT_GAS == "true" ? true : false || false
 
 const config: HardhatUserConfig = {
@@ -36,9 +35,19 @@ const config: HardhatUserConfig = {
             chainId: 4,
             url: RINKEBY_RPC_URL,
             accounts: [PRIVATE_KEY],
+            saveDeployments: true,
         },
     },
-    solidity: "0.8.8",
+    solidity: {
+        compilers: [
+            {
+                version: "0.8.8",
+            },
+            {
+                version: "0.4.24",
+            },
+        ],
+    },
     namedAccounts: {
         deployer: {
             default: 0,
@@ -46,6 +55,10 @@ const config: HardhatUserConfig = {
         player: {
             default: 1,
         },
+    },
+    etherscan: {
+        // npx hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
+        apiKey: ETHERSCAN_API_KEY,
     },
     gasReporter: {
         enabled: REPORT_GAS,
@@ -55,7 +68,7 @@ const config: HardhatUserConfig = {
         // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     },
     mocha: {
-        timeout: 200000,
+        timeout: 400000,
     },
 }
 
