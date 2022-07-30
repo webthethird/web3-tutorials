@@ -1,4 +1,10 @@
-// React Components are standalone, reusable functions that return HTML elements
+import { ConnectButton } from "web3uikit"
+
 export default function Header() {
-    return <div>Hello from Header!</div>
+    return (
+        <div>
+            <span>Decentralized Lottery</span>
+            <ConnectButton moralisAuth={false} />
+        </div>
+    )
 }
