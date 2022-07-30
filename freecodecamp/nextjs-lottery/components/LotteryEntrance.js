@@ -1,6 +1,6 @@
 // Need a function to allow users to enter the lottery
 import { useWeb3Contract } from "react-moralis"
-import {api} from "../constants/abi"
+import {abi} from "../constants/abi"
 
 export default function LotteryEntrance() {
     const  {runContractFunction: enterRaffle} = useWeb3Contract{
