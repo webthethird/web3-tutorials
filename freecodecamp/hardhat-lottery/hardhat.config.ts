@@ -28,6 +28,9 @@ const REPORT_GAS = process.env.REPORT_GAS == "true" ? true : false || false
 const config: HardhatUserConfig = {
     defaultNetwork: "hardhat",
     networks: {
+        localhost: {
+            chainId: 31337,
+        },
         hardhat: {
             chainId: 31337,
         },
