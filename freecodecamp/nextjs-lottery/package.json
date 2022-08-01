@@ -9,11 +9,11 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "moralis": "^1.5.9",
+        "moralis": "^1.8.0",
         "next": "12.1.5",
         "react": "18.0.0",
         "react-dom": "18.0.0",
-        "react-moralis": "^1.3.5",
+        "react-moralis": "^1.4.0",
         "web3uikit": "^0.1.159"
     },
     "devDependencies": {
