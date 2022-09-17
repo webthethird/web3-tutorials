@@ -14,13 +14,6 @@ export default function LotteryEntrance() {
     const [recentWinner, setRecentWinner] = useState("0")
     const dispatch = useNotification()
 
-    const { runContractFunction: getEntranceFee } = useWeb3Contract({
-        abi: abi,
-        contractAddress: raffleAddress,
-        functionName: "getEntranceFee",
-        params: {},
-    })
-
     async function updateUI() {
         const entranceFeeFromCall = await getEntranceFee({
             onError: (error) => console.error(error),
@@ -49,6 +42,13 @@ export default function LotteryEntrance() {
         functionName: "enterRaffle",
         params: {},
         msgValue: entranceFee,
+    })
+
+    const { runContractFunction: getEntranceFee } = useWeb3Contract({
+        abi: abi,
+        contractAddress: raffleAddress,
+        functionName: "getEntranceFee",
+        params: {},
     })
 
     const { runContractFunction: getNumPlayers } = useWeb3Contract({
