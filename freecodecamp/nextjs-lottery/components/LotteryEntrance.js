@@ -6,9 +6,10 @@ import { abi, contractAddresses } from "../constants"
 import { ethers } from "ethers"
 
 export default function LotteryEntrance() {
-    const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
+    const { chainId: chainIdHex, isWeb3Enabled, web3 } = useMoralis()
     const chainId = parseInt(chainIdHex)
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+
     const [entranceFee, setEntranceFee] = useState("0")
     const [numPlayers, setNumPlayers] = useState("0")
     const [recentWinner, setRecentWinner] = useState("0")
@@ -29,12 +30,30 @@ export default function LotteryEntrance() {
         setNumPlayers(numPlayersFromCall)
     }
 
+    async function listenForWinner() {
+        const raffle = new ethers.Contract(raffleAddress, abi, web3)
+        console.log("Waitinng for a winner...")
+        await new Promise((resolve, reject) => {
+            raffle.once("WinnerPicked", async () => {
+                console.log("New winner selected!")
+                try {
+                    await updateUI()
+                    resolve()
+                } catch (error) {
+                    console.error(error)
+                    reject(error)
+                }
+            })
+        })
+    }
+
     useEffect(() => {
         if (isWeb3Enabled) {
             // try to read the raffle entrance fee
             updateUI()
+            listenForWinner()
         }
-    }, [isWeb3Enabled, recentWinner])
+    }, [isWeb3Enabled, recentWinner, numPlayers])
 
     const { runContractFunction: enterRaffle } = useWeb3Contract({
         abi: abi,
