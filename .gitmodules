@@ -1,0 +1,3 @@
+[submodule "speedrunethereum/challenge-0-simple-nft"]
+	path = speedrunethereum/challenge-0-simple-nft
+	url = https://github.com/webthethird/scaffold-eth-typescript-challenges.git
